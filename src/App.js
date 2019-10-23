@@ -1,71 +1,102 @@
-import React from 'react';
+import React, {Component} from 'react';
 import Info from './components/info';
-import Form  from './components/form';
 import WeatherInfo from './components/WeatherInfo';
 import UsePositionDemo from './position';
+import Cookies from 'universal-cookie';
+import CitySelector from "./components/CitySelector";
+import CityList from "./components/CityList";
 
 
-const API_KEY= "9be03fc21f4dad03db699adf579f3c24";
+const API_KEY = "9be03fc21f4dad03db699adf579f3c24";
 
-class App extends React.Component {
+const cookies = new Cookies();
+const cities = cookies.get('cities')
 
+class App extends Component {
     state = {
-        temp: undefined,
-        city: undefined,
-        country: undefined,
-        pressure: undefined,
-        sunset: undefined,
-        error: undefined
+        cities: [],
+        temp:      undefined,
+        city:      undefined,
+        country:   undefined,
+        pressure:  undefined,
+        sunset:    undefined,
+        error:     undefined,
     };
 
-    gettingWeather =  async(e) => {
-        e.preventDefault();
-        const city = e.target.elements.city.value;
 
-            if(city){
-                    const api_url = await
-                        fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`);
-                    const data = await api_url.json();
+    componentDidMount() {
+        const cookies = new Cookies();
+        cookies.get(this.state.cities);
+    }
 
-                    var sunset = data.sys.sunset;
-                    var date = new Date();
-                    date.setTime(sunset);
-                    var sunset_date = date.getHours() + ":" +date.getMinutes() + ":" +date.getSeconds();
+    handleGetWeather = async (id) => {
+        if (id) {
+            const response = await
+                fetch(`https://api.openweathermap.org/data/2.5/weather?id=${id}&appid=${API_KEY}&units=metric`);
 
+            if (!response.ok) console.warn(response)
 
-                    this.setState({
-                        temp: data.main.temp,
-                        city: data.name,
-                        country: data.sys.country,
-                        pressure: data.main.pressure,
-                        sunset: sunset_date,
-                        error: undefined
-                    })
-            } else{
-                    this.setState({
-                        temp: undefined,
-                        city: undefined,
-                        country: undefined,
-                        pressure: undefined,
-                        sunset: undefined,
-                        error: "Введите название города"
-                    })
-                }
+            const data = await response.json();
+
+            let sunset = data.sys.sunset;
+            let date = new Date();
+            date.setTime(sunset);
+            let sunset_date = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+
+            this.setState({
+                temp:     data.main.temp,
+                city:     data.name,
+                country:  data.sys.country,
+                pressure: data.main.pressure,
+                sunset:   sunset_date,
+                error:    undefined
+            })
+        } else {
+            this.setState({
+                temp:     undefined,
+                city:     undefined,
+                country:  undefined,
+                pressure: undefined,
+                sunset:   undefined,
+                error:    "Enter city name"
+            })
+        }
     };
 
-    render(){
-        return(
+    handleSaveCity = id => {
+        const cookies = new Cookies();
+        const cities = [id, ...this.state.cities];
+        this.setState({cities});
+            if (id === !id) {
+                cookies.set('cities', JSON.stringify(cities));
+            } else {
+                return null
+            }
+    };
+
+    handleRemoveCity = id => {
+         const cookies = new Cookies();
+
+         const cities = [id, ...this.state.cities];
+
+         cities.splice(id, id+1);
+         cookies.remove('cities');
+    };
+
+    render() {
+        return (
             <div>
-                <UsePositionDemo/>
                 <Info/>
-                <Form weatherMethod={this.gettingWeather}/>
+                <CitySelector onGetWeather={this.handleGetWeather} onSaveCity={this.handleSaveCity} onRemoveCity={this.handleRemoveCity}/>
+                <CityList cities={this.state.cities}/>
+                <UsePositionDemo/>
                 <WeatherInfo
-                        temp={this.state.temp}
-                        city={this.state.city}
-                        country={this.state.country}
-                        pressure={this.state.pressure}
-                        sunset={this.state.sunset}
-                        error={this.state.error}
+                    temp={this.state.temp}
+                    city={this.state.city}
+                    country={this.state.country}
+                    pressure={this.state.pressure}
+                    sunset={this.state.sunset}
+                    error={this.state.error}
                 />
             </div>
         )
