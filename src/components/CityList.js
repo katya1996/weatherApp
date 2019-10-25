@@ -1,17 +1,17 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import Cookies from "universal-cookie";
+//import Cookies from "universal-cookie";
+import Cookies from 'js-cookie';
 import './CityList.css'
-import cityList from '../resources/city.list'
+import cityList from '../resources/city.list';
 
-const CityList = ({cities}) => {
-    const renderCity = id => {
-        const city = cityList.find(c => c.id === id)
-        if(!city) return;
+const CityList = ({cities, onRemoveCity}) => {
+    const renderCity = (id, i) => {
+        const city = cityList.find(c => c.id === id);
 
         return <div
                     className="buttonType"
                     key={id}
+                    onClick={() => {onRemoveCity(i)}}
                 >
                 {city.name}
                 </div>
@@ -19,13 +19,10 @@ const CityList = ({cities}) => {
 
     return (
         <div>
-            {cities && cities.map(id => renderCity(id))}
+            {cities.map((id, i) => renderCity(id, i))}
         </div>
     );
 };
 
-CityList.propTypes = {
-    
-};
 
 export default CityList;

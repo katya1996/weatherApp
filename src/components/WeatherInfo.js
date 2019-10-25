@@ -1,7 +1,5 @@
 import React from 'react';
 
-
-
 const WeatherInfo = props => (
         <div>
               { props.city &&
@@ -14,7 +12,6 @@ const WeatherInfo = props => (
               }
                      <p>{props.error}</p>
             </div>
-)
-
+);
 
 export default WeatherInfo;

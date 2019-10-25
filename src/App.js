@@ -2,39 +2,41 @@ import React, {Component} from 'react';
 import Info from './components/info';
 import WeatherInfo from './components/WeatherInfo';
 import UsePositionDemo from './position';
-import Cookies from 'universal-cookie';
+//import Cookies from 'universal-cookie';
+import Cookies from 'js-cookie';
 import CitySelector from "./components/CitySelector";
 import CityList from "./components/CityList";
 
 
 const API_KEY = "9be03fc21f4dad03db699adf579f3c24";
 
-const cookies = new Cookies();
-const cities = cookies.get('cities')
+// const Cookies = new Cookies();
+// const cities = Cookies.get('cities')
 
 class App extends Component {
     state = {
-        cities: [],
-        temp:      undefined,
-        city:      undefined,
-        country:   undefined,
-        pressure:  undefined,
-        sunset:    undefined,
-        error:     undefined,
+        cities:   [],
+        temp:     undefined,
+        city:     undefined,
+        country:  undefined,
+        pressure: undefined,
+        sunset:   undefined,
+        error:    undefined,
     };
 
 
     componentDidMount() {
-        const cookies = new Cookies();
-        cookies.get(this.state.cities);
+        let cities = Cookies.get('cities');
+        //Cookies.set('cities', this.state.cities);
+        if(cities) {
+            this.setState({cities: JSON.parse(cities)});
+        }
     }
 
     handleGetWeather = async (id) => {
         if (id) {
             const response = await
                 fetch(`https://api.openweathermap.org/data/2.5/weather?id=${id}&appid=${API_KEY}&units=metric`);
-
-            if (!response.ok) console.warn(response)
 
             const data = await response.json();
 
@@ -64,31 +66,27 @@ class App extends Component {
     };
 
     handleSaveCity = id => {
-        const cookies = new Cookies();
-        const cities = [id, ...this.state.cities];
-        this.setState({cities});
-            if (id === !id) {
-                cookies.set('cities', JSON.stringify(cities));
-            } else {
-                return null
-            }
+        if (!this.state.cities.includes(id)) {
+            this.setState({cities: [id, ...this.state.cities]}, () => {
+                Cookies.set('cities', JSON.stringify(this.state.cities), {expires: new Date(2999, 1)});
+            });
+        } else {
+            return null
+        }
     };
 
-    handleRemoveCity = id => {
-         const cookies = new Cookies();
-
-         const cities = [id, ...this.state.cities];
-
-         cities.splice(id, id+1);
-         cookies.remove('cities');
+    handleRemoveCity = (i) => {
+        this.state.cities.splice(i, 1);
+        this.setState({cities: this.state.cities});
+        Cookies.set('cities', JSON.stringify(this.state.cities), {expires: new Date(2999, 1)});
     };
 
     render() {
         return (
             <div>
                 <Info/>
-                <CitySelector onGetWeather={this.handleGetWeather} onSaveCity={this.handleSaveCity} onRemoveCity={this.handleRemoveCity}/>
-                <CityList cities={this.state.cities}/>
+                <CitySelector onGetWeather={this.handleGetWeather} onSaveCity={this.handleSaveCity}/>
+                <CityList cities={this.state.cities} onRemoveCity={this.handleRemoveCity}/>
                 <UsePositionDemo/>
                 <WeatherInfo
                     temp={this.state.temp}

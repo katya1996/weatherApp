@@ -1,6 +1,10 @@
 .buttonType{
+  background-image: url(../resources/images.png) ;
+  background-position:  right top;
+  background-repeat: no-repeat;
+  background-size: 18px;
   display: inline-block;
   border: solid 1px black;
-  padding: 5px;
+  padding: 5px 20px;
   margin: 10px;
 }

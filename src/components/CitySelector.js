@@ -1,11 +1,9 @@
 import React, {useState} from 'react';
-import PropTypes from 'prop-types';
 import cityList from '../resources/city.list';
 
-const CitySelector = ({ onGetWeather, onSaveCity, onRemoveCity }) => {
+const CitySelector = ({ onGetWeather, onSaveCity }) => {
     const [name, setName] = useState('');
     const [selected, setSelected] = useState('');
-
 
 
     const handleSearch = (e) => {
@@ -13,10 +11,11 @@ const CitySelector = ({ onGetWeather, onSaveCity, onRemoveCity }) => {
     };
 
     const handleCityClick = (id) => {
-        setSelected(id)
+        setSelected(id);
+        onGetWeather(id);
+        onSaveCity(id);
+        setName(" ");
     };
-
-
 
     const renderCityList = () => {
         if (name.length <= 3) return
@@ -35,20 +34,10 @@ const CitySelector = ({ onGetWeather, onSaveCity, onRemoveCity }) => {
         ))
     };
 
-    const saveCity = () => {
-        onSaveCity(selected);
-        setName(" ");
-    };
-
-    const removeCity = () => {
-        onRemoveCity(name);
-        setName(" ");
-    };
-
-    const getWeather = () => {
-        onGetWeather(selected);
-        setName(" ");
-    };
+    // const getWeather = () => {
+    //     onGetWeather(selected);
+    //     setName(" ");
+    // };
 
     return (
         <div>
@@ -60,10 +49,8 @@ const CitySelector = ({ onGetWeather, onSaveCity, onRemoveCity }) => {
             />
             {selected && (
                 <>
-                    <button onClick={getWeather}>Get weather</button>
-                    <button onClick={saveCity}>Save city</button>
-                    <button onClick={removeCity}>Remove city</button>
-                    {/*<RemoveCity onRemoveCity={this.handleRemoveCity}/>*/}
+                    {/*<button onClick={getWeather}>Get weather</button>*/}
+
                 </>
             )}
             {renderCityList()}
