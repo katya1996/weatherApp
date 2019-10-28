@@ -86,7 +86,7 @@ class App extends Component {
             <div>
                 <Info/>
                 <CitySelector onGetWeather={this.handleGetWeather} onSaveCity={this.handleSaveCity}/>
-                <CityList cities={this.state.cities} onRemoveCity={this.handleRemoveCity}/>
+                <CityList cities={this.state.cities} onRemoveCity={this.handleRemoveCity}  onGetWeather={this.handleGetWeather} />
                 <UsePositionDemo/>
                 <WeatherInfo
                     temp={this.state.temp}
